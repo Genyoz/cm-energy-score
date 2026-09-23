@@ -26,9 +26,11 @@ function buildRestitutionJSON(block3Text, reframeText, bridgeText, secondaryText
 // ne bloque jamais l'affichage du résultat. Retourne l'id de la ligne
 // créée (ou null en cas d'échec).
 async function insertRespondent(computed, answers, restitutionJSON) {
-  const { data, error } = await supabase
+  const id = crypto.randomUUID();
+  const { error } = await supabase
     .from('respondents')
     .insert({
+      id,
       score_percent:          computed.scorePercent,
       score_10:               computed.score10,
       profil_dominant:        computed.profilDominant,
@@ -40,15 +42,13 @@ async function insertRespondent(computed, answers, restitutionJSON) {
       score_axe_burnout:      computed.axisScoresBruts.burnout,
       reponses_brutes:        answers,
       restitution:            restitutionJSON,
-    })
-    .select('id')
-    .single();
+    });
 
   if (error) {
     console.error('Insert respondents failed:', error);
     return null;
   }
-  return data.id;
+  return id;
 }
 
 // URL réelle du deep dive — seul endroit à modifier si elle change.
