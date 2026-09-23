@@ -105,7 +105,7 @@ function flameSvg(size, gradientId) {
 
 // ─── Handler ─────────────────────────────────────────────────────────────────
 
-export default async function handler(req) {
+export default async function handler(req, res) {
   const host     = req.headers['x-forwarded-host'] || req.headers.host;
   const protocol = req.headers['x-forwarded-proto'] || 'https';
   const { searchParams } = new URL(req.url, `${protocol}://${host}`);
@@ -118,10 +118,10 @@ export default async function handler(req) {
 
   // Validation minimale
   if (!profile || !PROFILE_NAMES[profile]) {
-    return new Response('Invalid profile', { status: 400 });
+    return res.status(400).send('Invalid profile');
   }
   if (isNaN(score)) {
-    return new Response('Invalid score', { status: 400 });
+    return res.status(400).send('Invalid score');
   }
 
   // ── Résolution des variables ──────────────────────────────────────────────
@@ -142,10 +142,11 @@ export default async function handler(req) {
   }
 
   // ── Chargement Poppins ───────────────────────────────────────────────────
+  // .ttf obligatoire — @vercel/og (opentype.js en interne) ne décompresse pas le WOFF2
   const [poppinsRegular, poppinsSemiBold, poppinsLight] = await Promise.all([
-    fetch('https://cdn.jsdelivr.net/fontsource/fonts/poppins@5.3.0/latin-400-normal.woff2').then(r => r.arrayBuffer()),
-    fetch('https://cdn.jsdelivr.net/fontsource/fonts/poppins@5.3.0/latin-600-normal.woff2').then(r => r.arrayBuffer()),
-    fetch('https://cdn.jsdelivr.net/fontsource/fonts/poppins@5.3.0/latin-300-normal.woff2').then(r => r.arrayBuffer()),
+    fetch('https://cdn.jsdelivr.net/fontsource/fonts/poppins@5.3.0/latin-400-normal.ttf').then(r => r.arrayBuffer()),
+    fetch('https://cdn.jsdelivr.net/fontsource/fonts/poppins@5.3.0/latin-600-normal.ttf').then(r => r.arrayBuffer()),
+    fetch('https://cdn.jsdelivr.net/fontsource/fonts/poppins@5.3.0/latin-300-normal.ttf').then(r => r.arrayBuffer()),
   ]);
 
   // ── Composant — React.createElement, sans JSX ────────────────────────────
@@ -440,18 +441,17 @@ export default async function handler(req) {
     ],
   });
 
-  // Si download=1 — forcer le téléchargement du PNG plutôt que l'affichage
+  // Conversion du Response (style fetch) renvoyé par ImageResponse
+  // en buffer, pour écriture via l'API Node.js classique (res)
+  const buffer = Buffer.from(await imageResponse.arrayBuffer());
+
+  res.setHeader('Content-Type', 'image/png');
+
   if (download === '1') {
-    const buffer = await imageResponse.arrayBuffer();
-    return new Response(buffer, {
-      status: 200,
-      headers: {
-        'Content-Type':        'image/png',
-        'Content-Disposition': 'attachment; filename="cm-energy-score-result.png"',
-        'Cache-Control':       'public, max-age=31536000, immutable',
-      },
-    });
+    res.setHeader('Content-Disposition', 'attachment; filename="cm-energy-score-result.png"');
+  } else {
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
   }
 
-  return imageResponse;
+  return res.status(200).send(buffer);
 }
