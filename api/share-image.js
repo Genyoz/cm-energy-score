@@ -106,7 +106,9 @@ function flameSvg(size, gradientId) {
 // ─── Handler ─────────────────────────────────────────────────────────────────
 
 export default async function handler(req) {
-  const { searchParams } = new URL(req.url);
+  const host     = req.headers['x-forwarded-host'] || req.headers.host;
+  const protocol = req.headers['x-forwarded-proto'] || 'https';
+  const { searchParams } = new URL(req.url, `${protocol}://${host}`);
 
   const profile       = searchParams.get('profile');
   const score         = parseFloat(searchParams.get('score'));
