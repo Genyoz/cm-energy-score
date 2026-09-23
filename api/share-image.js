@@ -143,9 +143,9 @@ export default async function handler(req) {
 
   // ── Chargement Poppins ───────────────────────────────────────────────────
   const [poppinsRegular, poppinsSemiBold, poppinsLight] = await Promise.all([
-    fetch('https://fonts.gstatic.com/s/poppins/v21/pxiEyp8kv8JHgFVrJJfecg.woff2').then(r => r.arrayBuffer()),
-    fetch('https://fonts.gstatic.com/s/poppins/v21/pxiByp8kv8JHgFVrLEj6Z1xlFQ.woff2').then(r => r.arrayBuffer()),
-    fetch('https://fonts.gstatic.com/s/poppins/v21/pxiDyp8kv8JHgFVrJJLm21llEN2PQEhcqw.woff2').then(r => r.arrayBuffer()),
+    fetch('https://cdn.jsdelivr.net/fontsource/fonts/poppins@5.3.0/latin-400-normal.woff2').then(r => r.arrayBuffer()),
+    fetch('https://cdn.jsdelivr.net/fontsource/fonts/poppins@5.3.0/latin-600-normal.woff2').then(r => r.arrayBuffer()),
+    fetch('https://cdn.jsdelivr.net/fontsource/fonts/poppins@5.3.0/latin-300-normal.woff2').then(r => r.arrayBuffer()),
   ]);
 
   // ── Composant — React.createElement, sans JSX ────────────────────────────
