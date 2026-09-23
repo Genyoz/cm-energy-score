@@ -3,8 +3,14 @@
 // Aucune dépendance Supabase — tout est dans les query params + tables hardcodées.
 // Endpoint : GET /api/share-image?profile=X&score=Y&fragmentValue=Z&id=UUID
 //            GET /api/share-image?profile=architecte&score=Y&axis=Z&id=UUID
+//
+// Écrit sans JSX (React.createElement direct) car le build de ce projet
+// (Vite, pas Next.js) ne transforme pas le JSX dans les fichiers .js de /api.
 
+import React from 'react';
 import { ImageResponse } from '@vercel/og';
+
+const h = React.createElement;
 
 // ─── Tables hardcodées ───────────────────────────────────────────────────────
 
@@ -134,28 +140,34 @@ export default async function handler(req) {
   }
 
   // ── Chargement Poppins ───────────────────────────────────────────────────
-  // Poppins Regular (400) — utilisé pour la majorité du texte
   const [poppinsRegular, poppinsSemiBold, poppinsLight] = await Promise.all([
     fetch('https://fonts.gstatic.com/s/poppins/v21/pxiEyp8kv8JHgFVrJJfecg.woff2').then(r => r.arrayBuffer()),
     fetch('https://fonts.gstatic.com/s/poppins/v21/pxiByp8kv8JHgFVrLEj6Z1xlFQ.woff2').then(r => r.arrayBuffer()),
     fetch('https://fonts.gstatic.com/s/poppins/v21/pxiDyp8kv8JHgFVrJJLm21llEN2PQEhcqw.woff2').then(r => r.arrayBuffer()),
   ]);
 
-  // ── Composant JSX ────────────────────────────────────────────────────────
+  // ── Composant — React.createElement, sans JSX ────────────────────────────
 
-  const imageResponse = new ImageResponse(
-    <div
-      style={{
+  const flameGaugeSvg = flameSvg(68, 'fga');
+  const flameBadgeSvg = flameSvg(34, 'fgb');
+
+  const element = h(
+    'div',
+    {
+      style: {
         width: '1080px',
         height: '1080px',
         display: 'flex',
         fontFamily: 'Poppins, Arial, sans-serif',
         overflow: 'hidden',
-      }}
-    >
-      {/* ── GAUCHE 40% — fond Beige ── */}
-      <div
-        style={{
+      },
+    },
+
+    // ── GAUCHE 40% — fond Beige ──
+    h(
+      'div',
+      {
+        style: {
           width: '40%',
           background: '#fdf9f2',
           display: 'flex',
@@ -164,120 +176,170 @@ export default async function handler(req) {
           justifyContent: 'center',
           gap: '80px',
           padding: '56px 32px',
-        }}
-      >
-        {/* Jauge verticale */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+        },
+      },
 
-          {/* Label COMPENSATION */}
-          <div style={{
-            fontSize: '20px', fontWeight: 600,
-            letterSpacing: '0.06em', textTransform: 'uppercase',
-            color: 'rgba(85,58,89,0.60)',
-          }}>
-            Compensation
-          </div>
+      // Jauge verticale
+      h(
+        'div',
+        { style: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' } },
 
-          {/* Barre jauge */}
-          <div style={{ position: 'relative', width: '98px', height: '440px' }}>
-            <div style={{
-              width: '98px', height: '440px',
-              position: 'relative', overflow: 'hidden',
-              borderRadius: '999px',
-              background: 'rgba(255,255,255,0.38)',
-              border: '1px solid rgba(255,255,255,0.75)',
-              boxShadow: '0 12px 36px rgba(237,140,102,0.30)',
-            }}>
-              {/* Remplissage gradient */}
-              <div style={{
-                position: 'absolute', bottom: 0, left: 0, right: 0,
-                height: `${jaugeHeight}%`,
-                overflow: 'hidden',
-                borderBottomLeftRadius: '999px',
-                borderBottomRightRadius: '999px',
-              }}>
-                <div style={{
+        // Label COMPENSATION
+        h(
+          'div',
+          {
+            style: {
+              fontSize: '20px', fontWeight: 600,
+              letterSpacing: '0.06em', textTransform: 'uppercase',
+              color: 'rgba(85,58,89,0.60)',
+            },
+          },
+          'Compensation'
+        ),
+
+        // Barre jauge (wrapper relatif)
+        h(
+          'div',
+          { style: { position: 'relative', width: '98px', height: '440px' } },
+
+          // Fond de la barre
+          h(
+            'div',
+            {
+              style: {
+                width: '98px', height: '440px',
+                position: 'relative', overflow: 'hidden',
+                borderRadius: '999px',
+                background: 'rgba(255,255,255,0.38)',
+                border: '1px solid rgba(255,255,255,0.75)',
+                boxShadow: '0 12px 36px rgba(237,140,102,0.30)',
+              },
+            },
+            // Remplissage gradient
+            h(
+              'div',
+              {
+                style: {
+                  position: 'absolute', bottom: 0, left: 0, right: 0,
+                  height: `${jaugeHeight}%`,
+                  overflow: 'hidden',
+                  borderBottomLeftRadius: '999px',
+                  borderBottomRightRadius: '999px',
+                },
+              },
+              h('div', {
+                style: {
                   position: 'absolute', bottom: 0, left: 0, right: 0,
                   height: '440px',
                   background: 'linear-gradient(to top, #2a1f2e, #d16b59, #f9cf81)',
-                }} />
-              </div>
-            </div>
+                },
+              })
+            )
+          ),
 
-            {/* Badge score */}
-            <div style={{
-              position: 'absolute',
-              top: `${badgeTop}%`,
-              left: '49px',
-              transform: 'translate(-50%, -50%)',
-            }}>
-              <div style={{
-                background: '#fdf9f2',
-                borderRadius: '40px',
-                padding: '8px 20px',
-                fontSize: '24px', fontWeight: 600,
-                color: '#2a1f2e',
-                boxShadow: '6px 6px 16px rgba(190,150,140,0.12), -4px -4px 10px rgba(255,255,255,0.85)',
-              }}>
-                {score}
-              </div>
-            </div>
+          // Badge score
+          h(
+            'div',
+            {
+              style: {
+                position: 'absolute',
+                top: `${badgeTop}%`,
+                left: '49px',
+                transform: 'translate(-50%, -50%)',
+              },
+            },
+            h(
+              'div',
+              {
+                style: {
+                  background: '#fdf9f2',
+                  borderRadius: '40px',
+                  padding: '8px 20px',
+                  fontSize: '24px', fontWeight: 600,
+                  color: '#2a1f2e',
+                  boxShadow: '6px 6px 16px rgba(190,150,140,0.12), -4px -4px 10px rgba(255,255,255,0.85)',
+                },
+              },
+              String(score)
+            )
+          ),
 
-            {/* FlameLogo aligné sur la ligne de coupure */}
-            <div style={{
-              position: 'absolute',
-              top: `${badgeTop}%`,
-              left: '49px',
-              transform: 'translate(calc(-50% + 116px), -50%)',
-              filter: 'drop-shadow(0 6px 12px rgba(190,150,140,0.35))',
-              display: 'flex',
-            }}>
-              <img
-                src={`data:image/svg+xml;utf8,${encodeURIComponent(flameSvg(68, 'fga'))}`}
-                width={68} height={68}
-              />
-            </div>
-          </div>
+          // FlameLogo aligné sur la ligne de coupure
+          h(
+            'div',
+            {
+              style: {
+                position: 'absolute',
+                top: `${badgeTop}%`,
+                left: '49px',
+                transform: 'translate(calc(-50% + 116px), -50%)',
+                filter: 'drop-shadow(0 6px 12px rgba(190,150,140,0.35))',
+                display: 'flex',
+              },
+            },
+            h('img', {
+              src: `data:image/svg+xml;utf8,${encodeURIComponent(flameGaugeSvg)}`,
+              width: 68,
+              height: 68,
+            })
+          )
+        ),
 
-          {/* Label SIGNAL */}
-          <div style={{
-            fontSize: '20px', fontWeight: 600,
-            letterSpacing: '0.06em', textTransform: 'uppercase',
-            color: 'rgba(85,58,89,0.60)',
-          }}>
-            Signal
-          </div>
-        </div>
+        // Label SIGNAL
+        h(
+          'div',
+          {
+            style: {
+              fontSize: '20px', fontWeight: 600,
+              letterSpacing: '0.06em', textTransform: 'uppercase',
+              color: 'rgba(85,58,89,0.60)',
+            },
+          },
+          'Signal'
+        )
+      ),
 
-        {/* Badge CM Energy Score */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: '24px',
-          padding: '18px 40px 18px 22px',
-          borderRadius: '999px',
-          background: 'rgba(255,255,255,0.38)',
-          border: '1px solid rgba(255,255,255,0.75)',
-        }}>
-          <div style={{ width: '42px', height: '42px', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-            <img
-              src={`data:image/svg+xml;utf8,${encodeURIComponent(flameSvg(34, 'fgb'))}`}
-              width={34} height={34}
-            />
-          </div>
-          {/* Gradient texte — fallback Coral si non supporté */}
-          <span style={{
-            fontWeight: 500, fontSize: '24px',
-            background: 'linear-gradient(135deg, #553a59, #d16b59, #f9cf81)',
-            backgroundClip: 'text',
-            color: '#ed8c66', // fallback Coral
-          }}>
-            CM Energy Score
-          </span>
-        </div>
-      </div>
+      // Badge CM Energy Score
+      h(
+        'div',
+        {
+          style: {
+            display: 'flex', alignItems: 'center', gap: '24px',
+            padding: '18px 40px 18px 22px',
+            borderRadius: '999px',
+            background: 'rgba(255,255,255,0.38)',
+            border: '1px solid rgba(255,255,255,0.75)',
+          },
+        },
+        h(
+          'div',
+          { style: { width: '42px', height: '42px', display: 'flex', alignItems: 'center', flexShrink: 0 } },
+          h('img', {
+            src: `data:image/svg+xml;utf8,${encodeURIComponent(flameBadgeSvg)}`,
+            width: 34,
+            height: 34,
+          })
+        ),
+        h(
+          'span',
+          {
+            style: {
+              fontWeight: 500, fontSize: '24px',
+              background: 'linear-gradient(135deg, #553a59, #d16b59, #f9cf81)',
+              backgroundClip: 'text',
+              color: '#ed8c66', // fallback Coral
+            },
+          },
+          'CM Energy Score'
+        )
+      )
+    ),
 
-      {/* ── DROITE 60% — Deep Plum ── */}
-      <div
-        style={{
+    // ── DROITE 60% — Deep Plum ──
+    h(
+      'div',
+      {
+        style: {
           width: '60%',
           background: '#2a1f2e',
           boxShadow: '-16px 0 48px rgba(209,107,89,0.35)',
@@ -288,74 +350,93 @@ export default async function handler(req) {
           padding: '64px 48px',
           textAlign: 'center',
           position: 'relative',
-        }}
-      >
-        {/* Texte annonce profil */}
-        <div style={{
-          fontSize: '28px', fontWeight: 400,
-          color: 'rgba(254,251,248,0.60)',
-          lineHeight: 1.5, marginBottom: '28px',
-        }}>
-          {`Turns out, on Discord, I operate like ${article}`}
-        </div>
+        },
+      },
 
-        {/* Nom du profil — gradient texte, fallback Coral */}
-        <div style={{
-          fontSize: '44px', fontWeight: 600,
-          background: 'linear-gradient(135deg, #553a59, #d16b59, #f9cf81)',
-          backgroundClip: 'text',
-          color: '#ed8c66', // fallback Coral
-          lineHeight: 1.2,
-          marginBottom: '56px',
-        }}>
-          {profileName}
-        </div>
+      // Texte annonce profil
+      h(
+        'div',
+        {
+          style: {
+            fontSize: '28px', fontWeight: 400,
+            color: 'rgba(254,251,248,0.60)',
+            lineHeight: 1.5, marginBottom: '28px',
+          },
+        },
+        `Turns out, on Discord, I operate like ${article}`
+      ),
 
-        {/* Punchline */}
-        <div style={{
-          fontSize: '25.6px', fontWeight: 300,
-          color: 'rgba(254,251,248,0.75)',
-          lineHeight: 1.7,
-          maxWidth: '440px',
-        }}>
-          {punchline}
-        </div>
+      // Nom du profil — gradient texte, fallback Coral
+      h(
+        'div',
+        {
+          style: {
+            fontSize: '44px', fontWeight: 600,
+            background: 'linear-gradient(135deg, #553a59, #d16b59, #f9cf81)',
+            backgroundClip: 'text',
+            color: '#ed8c66', // fallback Coral
+            lineHeight: 1.2,
+            marginBottom: '56px',
+          },
+        },
+        profileName
+      ),
 
-        {/* Badge Carefully made for CMs */}
-        <div style={{
-          position: 'absolute', bottom: '64px', right: '64px',
-          display: 'flex',
-        }}>
-          <div style={{
-            display: 'flex', alignItems: 'center',
-            padding: '12px 28px',
-            borderRadius: '999px',
-            background: 'rgba(255,255,255,0.07)',
-            border: '0.5px solid rgba(255,255,255,0.12)',
-          }}>
-            <span style={{
-              fontSize: '24px', fontWeight: 400,
-              background: 'linear-gradient(135deg, #553a59, #d16b59, #f9cf81)',
-              backgroundClip: 'text',
-              color: '#ed8c66', // fallback Coral
-            }}>
-              Carefully made for CMs
-            </span>
-          </div>
-        </div>
+      // Punchline
+      h(
+        'div',
+        {
+          style: {
+            fontSize: '25.6px', fontWeight: 300,
+            color: 'rgba(254,251,248,0.75)',
+            lineHeight: 1.7,
+            maxWidth: '440px',
+          },
+        },
+        punchline
+      ),
 
-      </div>
-    </div>,
-    {
-      width: 1080,
-      height: 1080,
-      fonts: [
-        { name: 'Poppins', data: poppinsLight,    style: 'normal', weight: 300 },
-        { name: 'Poppins', data: poppinsRegular,  style: 'normal', weight: 400 },
-        { name: 'Poppins', data: poppinsSemiBold, style: 'normal', weight: 600 },
-      ],
-    }
+      // Badge Carefully made for CMs
+      h(
+        'div',
+        { style: { position: 'absolute', bottom: '64px', right: '64px', display: 'flex' } },
+        h(
+          'div',
+          {
+            style: {
+              display: 'flex', alignItems: 'center',
+              padding: '12px 28px',
+              borderRadius: '999px',
+              background: 'rgba(255,255,255,0.07)',
+              border: '0.5px solid rgba(255,255,255,0.12)',
+            },
+          },
+          h(
+            'span',
+            {
+              style: {
+                fontSize: '24px', fontWeight: 400,
+                background: 'linear-gradient(135deg, #553a59, #d16b59, #f9cf81)',
+                backgroundClip: 'text',
+                color: '#ed8c66', // fallback Coral
+              },
+            },
+            'Carefully made for CMs'
+          )
+        )
+      )
+    )
   );
+
+  const imageResponse = new ImageResponse(element, {
+    width: 1080,
+    height: 1080,
+    fonts: [
+      { name: 'Poppins', data: poppinsLight,    style: 'normal', weight: 300 },
+      { name: 'Poppins', data: poppinsRegular,  style: 'normal', weight: 400 },
+      { name: 'Poppins', data: poppinsSemiBold, style: 'normal', weight: 600 },
+    ],
+  });
 
   // Si download=1 — forcer le téléchargement du PNG plutôt que l'affichage
   if (download === '1') {
