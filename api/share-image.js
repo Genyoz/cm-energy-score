@@ -142,10 +142,11 @@ export default async function handler(req) {
   }
 
   // ── Chargement Poppins ───────────────────────────────────────────────────
+  // .ttf obligatoire — @vercel/og (opentype.js en interne) ne décompresse pas le WOFF2
   const [poppinsRegular, poppinsSemiBold, poppinsLight] = await Promise.all([
-    fetch('https://cdn.jsdelivr.net/fontsource/fonts/poppins@5.3.0/latin-400-normal.woff2').then(r => r.arrayBuffer()),
-    fetch('https://cdn.jsdelivr.net/fontsource/fonts/poppins@5.3.0/latin-600-normal.woff2').then(r => r.arrayBuffer()),
-    fetch('https://cdn.jsdelivr.net/fontsource/fonts/poppins@5.3.0/latin-300-normal.woff2').then(r => r.arrayBuffer()),
+    fetch('https://cdn.jsdelivr.net/fontsource/fonts/poppins@5.3.0/latin-400-normal.ttf').then(r => r.arrayBuffer()),
+    fetch('https://cdn.jsdelivr.net/fontsource/fonts/poppins@5.3.0/latin-600-normal.ttf').then(r => r.arrayBuffer()),
+    fetch('https://cdn.jsdelivr.net/fontsource/fonts/poppins@5.3.0/latin-300-normal.ttf').then(r => r.arrayBuffer()),
   ]);
 
   // ── Composant — React.createElement, sans JSX ────────────────────────────
