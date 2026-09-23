@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/share-image.js": {
+      "runtime": "edge"
+    }
+  }
+}
