@@ -1,7 +1,4 @@
 {
-  "functions": {
-    "api/share-image.js": {
-      "runtime": "@vercel/edge"
-    }
-  }
+  "buildCommand": "vite build",
+  "outputDirectory": "dist"
 }
