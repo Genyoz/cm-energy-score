@@ -4,6 +4,9 @@
 // Endpoint : GET /api/share-image?profile=X&score=Y&fragmentValue=Z&id=UUID
 //            GET /api/share-image?profile=architecte&score=Y&axis=Z&id=UUID
 //
+// v3 — ajoute display:'flex' sur les 3 <div> à enfant-élément unique (règle Satori),
+// vérification des polices, et try/catch lisible dans les logs.
+//
 // Écrit sans JSX (React.createElement direct) car le build de ce projet
 // (Vite, pas Next.js) ne transforme pas le JSX dans les fichiers .js de /api.
 
@@ -143,10 +146,16 @@ export default async function handler(req, res) {
 
   // ── Chargement Poppins ───────────────────────────────────────────────────
   // .ttf obligatoire — @vercel/og (opentype.js en interne) ne décompresse pas le WOFF2
+  // Vérifie que chaque police est bien arrivée (sinon erreur claire dans les logs Vercel)
+  const loadFont = async (url) => {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(`Font fetch failed (${r.status}) : ${url}`);
+    return r.arrayBuffer();
+  };
   const [poppinsRegular, poppinsSemiBold, poppinsLight] = await Promise.all([
-    fetch('https://cdn.jsdelivr.net/fontsource/fonts/poppins@5.3.0/latin-400-normal.ttf').then(r => r.arrayBuffer()),
-    fetch('https://cdn.jsdelivr.net/fontsource/fonts/poppins@5.3.0/latin-600-normal.ttf').then(r => r.arrayBuffer()),
-    fetch('https://cdn.jsdelivr.net/fontsource/fonts/poppins@5.3.0/latin-300-normal.ttf').then(r => r.arrayBuffer()),
+    loadFont('https://cdn.jsdelivr.net/fontsource/fonts/poppins@5.3.0/latin-400-normal.ttf'),
+    loadFont('https://cdn.jsdelivr.net/fontsource/fonts/poppins@5.3.0/latin-600-normal.ttf'),
+    loadFont('https://cdn.jsdelivr.net/fontsource/fonts/poppins@5.3.0/latin-300-normal.ttf'),
   ]);
 
   // ── Composant — React.createElement, sans JSX ────────────────────────────
@@ -203,7 +212,7 @@ export default async function handler(req, res) {
         // Barre jauge (wrapper relatif)
         h(
           'div',
-          { style: { position: 'relative', width: '98px', height: '440px' } },
+          { style: { position: 'relative', width: '98px', height: '440px', display: 'flex' } },
 
           // Fond de la barre
           h(
@@ -212,6 +221,7 @@ export default async function handler(req, res) {
               style: {
                 width: '98px', height: '440px',
                 position: 'relative', overflow: 'hidden',
+                display: 'flex',
                 borderRadius: '999px',
                 background: 'rgba(255,255,255,0.38)',
                 border: '1px solid rgba(255,255,255,0.75)',
@@ -226,6 +236,7 @@ export default async function handler(req, res) {
                   position: 'absolute', bottom: 0, left: 0, right: 0,
                   height: `${jaugeHeight}%`,
                   overflow: 'hidden',
+                  display: 'flex',
                   borderBottomLeftRadius: '999px',
                   borderBottomRightRadius: '999px',
                 },
@@ -249,6 +260,7 @@ export default async function handler(req, res) {
                 top: `${badgeTop}%`,
                 left: '49px',
                 transform: 'translate(-50%, -50%)',
+                display: 'flex',
               },
             },
             h(
@@ -274,8 +286,8 @@ export default async function handler(req, res) {
               style: {
                 position: 'absolute',
                 top: `${badgeTop}%`,
-                left: '49px',
-                transform: 'translate(calc(-50% + 116px), -50%)',
+                left: '131px',
+                transform: 'translateY(-50%)',
                 filter: 'drop-shadow(0 6px 12px rgba(190,150,140,0.35))',
                 display: 'flex',
               },
@@ -443,7 +455,14 @@ export default async function handler(req, res) {
 
   // Conversion du Response (style fetch) renvoyé par ImageResponse
   // en buffer, pour écriture via l'API Node.js classique (res)
-  const buffer = Buffer.from(await imageResponse.arrayBuffer());
+  let buffer;
+  try {
+    buffer = Buffer.from(await imageResponse.arrayBuffer());
+  } catch (err) {
+    // Toute erreur de rendu Satori apparaît ici, lisible dans les logs Vercel
+    console.error('share-image render failed:', err.message, req.url);
+    return res.status(500).send('Image render failed');
+  }
 
   res.setHeader('Content-Type', 'image/png');
 
