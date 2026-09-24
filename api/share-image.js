@@ -274,8 +274,8 @@ export default async function handler(req, res) {
               style: {
                 position: 'absolute',
                 top: `${badgeTop}%`,
-                left: '49px',
-                transform: 'translate(calc(-50% + 116px), -50%)',
+                left: '131px',
+                transform: 'translateY(-50%)',
                 filter: 'drop-shadow(0 6px 12px rgba(190,150,140,0.35))',
                 display: 'flex',
               },
