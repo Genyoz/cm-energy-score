@@ -4,6 +4,7 @@
 // Endpoint : GET /api/share-image?profile=X&score=Y&fragmentValue=Z&id=UUID
 //            GET /api/share-image?profile=architecte&score=Y&axis=Z&id=UUID
 //
+// v4 — noms de profil sans "The", gap jauge 40px, texte en dégradé (color: transparent).
 // v3 — ajoute display:'flex' sur les 3 <div> à enfant-élément unique (règle Satori),
 // vérification des polices, et try/catch lisible dans les logs.
 //
@@ -18,12 +19,12 @@ const h = React.createElement;
 // ─── Tables hardcodées ───────────────────────────────────────────────────────
 
 const PROFILE_NAMES = {
-  reactivite:   'The Firefighter',
-  repetition:   'The Concierge',
-  invisibilite: 'The Ghost Developer',
-  dependance:   'The Guardian',
-  eponge:       'The Handyman',
-  architecte:   'The Architect',
+  reactivite:   'Firefighter',
+  repetition:   'Concierge',
+  invisibilite: 'Ghost Developer',
+  dependance:   'Guardian',
+  eponge:       'Handyman',
+  architecte:   'Architect',
 };
 
 const ARTICLE = {
@@ -194,7 +195,7 @@ export default async function handler(req, res) {
       // Jauge verticale
       h(
         'div',
-        { style: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' } },
+        { style: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '40px' } }, // 40px = espace identique jauge↔Compensation et jauge↔Signal
 
         // Label COMPENSATION
         h(
@@ -342,7 +343,7 @@ export default async function handler(req, res) {
               fontWeight: 500, fontSize: '24px',
               background: 'linear-gradient(135deg, #553a59, #d16b59, #f9cf81)',
               backgroundClip: 'text',
-              color: '#ed8c66', // fallback Coral
+              color: 'transparent',
             },
           },
           'CM Energy Score'
@@ -389,7 +390,7 @@ export default async function handler(req, res) {
             fontSize: '44px', fontWeight: 600,
             background: 'linear-gradient(135deg, #553a59, #d16b59, #f9cf81)',
             backgroundClip: 'text',
-            color: '#ed8c66', // fallback Coral
+            color: 'transparent',
             lineHeight: 1.2,
             marginBottom: '56px',
           },
@@ -433,7 +434,7 @@ export default async function handler(req, res) {
                 fontSize: '24px', fontWeight: 400,
                 background: 'linear-gradient(135deg, #553a59, #d16b59, #f9cf81)',
                 backgroundClip: 'text',
-                color: '#ed8c66', // fallback Coral
+                color: 'transparent',
               },
             },
             'Carefully made for CMs'

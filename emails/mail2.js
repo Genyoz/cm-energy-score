@@ -118,14 +118,14 @@ export function mail2Template({
   <title>What your ${profileName} mode doesn't tell you yet</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+  </style>
+  <style>
     @media (max-width: 480px) {
       .mail-inner  { padding: 20px 20px 32px !important; gap: 22px !important; }
       .opening     { font-size: 13.5px !important; }
       .body-text   { font-size: 13px !important; }
       .closing     { font-size: 13px !important; }
       .cta-section { gap: 28px !important; }
-      .cta-wrap    { flex-direction: column !important; align-items: stretch !important; gap: 10px !important; }
-      .btn-primary, .btn-secondary { text-align: center !important; width: 100% !important; padding: 0 16px !important; display: block !important; }
       .footer-badge { font-size: 12px !important; padding: 7px 16px !important; }
       .footer-meta  { font-size: 10px !important; }
       .footer-copy  { font-size: 10px !important; }
@@ -184,23 +184,25 @@ export function mail2Template({
                   Otherwise, go deeper into our deep dive.
                 </p>
 
-                <!-- DOUBLE CTA -->
-                <div class="cta-wrap" style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
-                  <a
-                    href="${opscircleUrl}"
-                    class="btn-primary"
-                    style="display:inline-block;padding:0 28px;height:48px;line-height:48px;border-radius:11px;font-family:'Poppins',Arial,sans-serif;font-size:14px;font-weight:500;text-decoration:none;background-color:#ed8c66;background-image:linear-gradient(135deg,#553a59,#d16b59,#f9cf81);color:#fefbf8;"
-                  >
-                    Discover the OpsCircle
-                  </a>
-                  <a
-                    href="${deepDiveUrl}"
-                    class="btn-secondary"
-                    style="display:inline-block;padding:0 24px;height:48px;line-height:48px;border-radius:11px;font-family:'Poppins',Arial,sans-serif;font-size:14px;font-weight:500;text-decoration:none;background:rgba(255,255,255,0.80);border:1px solid #ffffff;color:#553a59;"
-                  >
-                    Go to the deep dive
-                  </a>
-                </div>
+                <!-- DOUBLE CTA — côte à côte sur ordinateur, empilés sur mobile.
+                   Sans flexbox ni media query : Gmail supprime gap / flex-wrap / flex-direction. -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td align="center" style="font-size:0;line-height:0;text-align:center;">
+
+                      <div style="display:inline-block;width:100%;max-width:242px;vertical-align:top;padding:6px;box-sizing:border-box;">
+                        <a href="${opscircleUrl}" target="_blank"
+                           style="display:block;height:48px;line-height:48px;border-radius:11px;font-family:'Poppins',Arial,sans-serif;font-size:14px;font-weight:500;text-align:center;text-decoration:none;background-color:#ed8c66;background-image:linear-gradient(135deg,#553a59,#d16b59,#f9cf81);color:#fefbf8;">Discover the OpsCircle</a>
+                      </div>
+
+                      <div style="display:inline-block;width:100%;max-width:242px;vertical-align:top;padding:6px;box-sizing:border-box;">
+                        <a href="${deepDiveUrl}" target="_blank"
+                           style="display:block;height:46px;line-height:46px;border-radius:11px;font-family:'Poppins',Arial,sans-serif;font-size:14px;font-weight:500;text-align:center;text-decoration:none;background-color:rgba(255,255,255,0.80);border:1px solid #ffffff;color:#553a59;">Go to the deep dive</a>
+                      </div>
+
+                    </td>
+                  </tr>
+                </table>
 
               </div>
 

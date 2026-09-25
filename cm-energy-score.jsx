@@ -326,7 +326,8 @@ function AnswerCard({ option, axisKey, mobile, isSelected, hasSelection, onSelec
             style={{ width: '100%', height: '100%', objectFit: 'cover', border: 'none', outline: 'none', display: 'block' }}
           />
         </div>
-        <div style={{ flex: 1, fontSize: '13px', fontWeight: 300, lineHeight: 1.45, color: '#2a1f2e' }}>{option.text}</div>
+        {/* MODIF mobile : 13px/300 -> 14px/400 */}
+        <div style={{ flex: 1, fontSize: '14px', fontWeight: 400, lineHeight: 1.45, color: '#2a1f2e' }}>{option.text}</div>
       </div>
     );
   }
@@ -847,11 +848,13 @@ function HomeScreen({ mobile, onStart }) {
             <div style={{ width: '26px', height: '26px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><FlameLogo size={22} /></div>
             <span style={{ fontWeight: 500, fontSize: '12px', background: 'linear-gradient(135deg,#553a59,#d16b59,#f9cf81)', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' }}>CM Energy Score</span>
           </div>
-          <div style={{ fontSize: '37px', fontWeight: 400, lineHeight: 1.25, color: '#2a1f2e', marginBottom: '16px' }}>
+          {/* MODIF mobile : titre 37px/400 -> 42px/500 */}
+          <div style={{ fontSize: '42px', fontWeight: 500, lineHeight: 1.25, color: '#2a1f2e', marginBottom: '16px' }}>
             Does engaging your community lead to{' '}
             <span style={{ background: 'linear-gradient(135deg,#553a59,#d16b59,#f9cf81)', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' }}>burnout</span>?
           </div>
-          <div style={{ fontSize: '15px', fontWeight: 400, lineHeight: 1.6, color: 'rgba(85,58,89,0.60)', marginBottom: '20px' }}>
+          {/* MODIF mobile : sous-titre 400 -> 500 */}
+          <div style={{ fontSize: '15px', fontWeight: 500, lineHeight: 1.6, color: 'rgba(85,58,89,0.60)', marginBottom: '20px' }}>
             This free 5-minute scoring tool, reveals your energy investment level and uncovers the blind spots you've never seen in your Discord community operations.
           </div>
           <button
@@ -860,7 +863,8 @@ function HomeScreen({ mobile, onStart }) {
           >
             Start!
           </button>
-          <div style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(85,58,89,0.60)' }}>
+          {/* MODIF mobile : 300 -> 400 */}
+          <div style={{ fontSize: '13px', fontWeight: 400, color: 'rgba(85,58,89,0.60)' }}>
             5 minutes. Free. No mail needed to run.
           </div>
         </div>
@@ -1937,6 +1941,19 @@ export default function CMEnergyScoreApp() {
   const currentValue = answers[currentQuestion.axisKey][currentQuestion.axisIndex];
   const isLastQuestion = currentIndex === QUESTIONS.length - 1;
 
+  // Précharge les GIFs de la question actuelle et de la suivante — ils
+  // sont déjà en cache quand la question s'affiche (Q1 et Q2 se chargent
+  // dès la page d'accueil). Doit rester AVANT les "if (screen === ...)"
+  // plus bas : React interdit un hook après un return conditionnel.
+  useEffect(() => {
+    [QUESTIONS[currentIndex], QUESTIONS[currentIndex + 1]].forEach((q) => {
+      if (!q) return;
+      q.options.forEach((opt) => {
+        if (opt.gifUrl) { const img = new Image(); img.src = opt.gifUrl; }
+      });
+    });
+  }, [currentIndex]);
+
   function handleSelect(value) {
     setAnswers((prev) => {
       const next = { ...prev, [currentQuestion.axisKey]: [...prev[currentQuestion.axisKey]] };
@@ -2026,7 +2043,7 @@ export default function CMEnergyScoreApp() {
           >
             {currentOptions.map((opt) => (
               <AnswerCard
-                key={opt.value}
+                key={`${currentQuestion.id}-${opt.value}`}
                 option={opt}
                 axisKey={currentQuestion.axisKey}
                 mobile={mobile}

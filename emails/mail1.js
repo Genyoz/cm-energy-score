@@ -55,6 +55,8 @@ export function mail1Template({
   <![endif]-->
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+  </style>
+  <style>
     @media (max-width: 480px) {
       .mail-inner { padding: 20px 20px 32px !important; }
       .share-img  { max-width: 100% !important; border-radius: 10px !important; margin-bottom: 24px !important; }
@@ -65,8 +67,6 @@ export function mail1Template({
       .block-text { font-size: 13px !important; }
       .block-sec  { padding: 16px 18px !important; }
       .block-sec-title { font-size: 14px !important; }
-      .cta-wrap   { flex-direction: column !important; align-items: stretch !important; gap: 10px !important; }
-      .btn-primary, .btn-secondary { text-align: center !important; width: 100% !important; padding: 0 16px !important; display: block !important; }
       .separator  { margin: 24px 0 20px !important; }
       .footer-badge { font-size: 12px !important; padding: 7px 16px !important; }
       .footer-meta  { font-size: 10px !important; }
@@ -84,14 +84,20 @@ export function mail1Template({
           <tr>
             <td class="mail-inner" style="padding:48px 40px 40px;">
 
-              <!-- IMAGE PARTAGEABLE -->
-              <img
-                class="share-img"
-                src="${shareImageUrl}"
-                alt="Your CM Energy Score result — ${profileName}, score ${score_10}"
-                width="520"
-                style="display:block;width:100%;max-width:520px;margin:0 auto 32px;border-radius:14px;"
-              />
+              <!-- IMAGE PARTAGEABLE — cliquable, même lien que "Post your result" -->
+              <a href="${shareImageUrl}&download=1" target="_blank" style="display:block;text-decoration:none;max-width:520px;margin:0 auto;">
+                <img
+                  class="share-img"
+                  src="${shareImageUrl}"
+                  alt="Your CM Energy Score result — ${profileName}, score ${score_10}"
+                  width="520"
+                  border="0"
+                  style="display:block;width:100%;max-width:520px;margin:0 auto 10px;border-radius:14px;border:0;"
+                />
+              </a>
+              <p style="margin:0 0 32px 0;text-align:center;font-size:12px;font-weight:400;line-height:1.5;">
+                <a href="${shareImageUrl}&download=1" target="_blank" style="color:#ed8c66;text-decoration:none;">&#8595;&nbsp; Click the image to save it</a>
+              </p>
 
               <!-- INTRO -->
               <div class="intro" style="padding-left:18px;border-left:1px solid rgba(42,31,46,0.40);margin-bottom:40px;">
@@ -135,23 +141,25 @@ export function mail1Template({
 
               </div>
 
-              <!-- CTA -->
-              <div class="cta-wrap" style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:0;">
-                <a
-                  href="${shareImageUrl}&download=1"
-                  class="btn-primary"
-                  style="display:inline-block;padding:0 28px;height:48px;line-height:48px;border-radius:11px;font-family:'Poppins',Arial,sans-serif;font-size:14px;font-weight:500;text-decoration:none;background-color:#ed8c66;background-image:linear-gradient(135deg,#553a59,#d16b59,#f9cf81);color:#fefbf8;"
-                >
-                  Post your result
-                </a>
-                <a
-                  href="${deepDiveUrl}"
-                  class="btn-secondary"
-                  style="display:inline-block;padding:0 24px;height:48px;line-height:48px;border-radius:11px;font-family:'Poppins',Arial,sans-serif;font-size:14px;font-weight:500;text-decoration:none;background:rgba(255,255,255,0.80);border:1px solid #ffffff;color:#553a59;"
-                >
-                  Go to the deep dive
-                </a>
-              </div>
+              <!-- CTA — côte à côte sur ordinateur, empilés sur mobile.
+                   Sans flexbox ni media query : Gmail supprime gap / flex-wrap / flex-direction. -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td align="center" style="font-size:0;line-height:0;text-align:center;">
+
+                      <div style="display:inline-block;width:100%;max-width:242px;vertical-align:top;padding:6px;box-sizing:border-box;">
+                        <a href="${shareImageUrl}&download=1" target="_blank"
+                           style="display:block;height:48px;line-height:48px;border-radius:11px;font-family:'Poppins',Arial,sans-serif;font-size:14px;font-weight:500;text-align:center;text-decoration:none;background-color:#ed8c66;background-image:linear-gradient(135deg,#553a59,#d16b59,#f9cf81);color:#fefbf8;">Post your result</a>
+                      </div>
+
+                      <div style="display:inline-block;width:100%;max-width:242px;vertical-align:top;padding:6px;box-sizing:border-box;">
+                        <a href="${deepDiveUrl}" target="_blank"
+                           style="display:block;height:46px;line-height:46px;border-radius:11px;font-family:'Poppins',Arial,sans-serif;font-size:14px;font-weight:500;text-align:center;text-decoration:none;background-color:rgba(255,255,255,0.80);border:1px solid #ffffff;color:#553a59;">Go to the deep dive</a>
+                      </div>
+
+                    </td>
+                  </tr>
+                </table>
 
               <!-- SÉPARATEUR -->
               <hr class="separator" style="border:none;border-top:1px solid rgba(42,31,46,0.10);margin:36px 0 32px;" />

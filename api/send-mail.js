@@ -289,7 +289,7 @@ export default async function handler(req, res) {
   const { error: mail2Error } = await resend.emails.send({
     from:        'CM Energy Score <results@cmes.genyoz.com>',
     to:          row.email,
-    subject:     `What your ${PROFILE_NAMES[row.profil_dominant]} mode doesn't tell you yet!`,
+    subject:     `What your ${PROFILE_NAMES[row.profil_dominant].replace(/^The /, '')} mode doesn't tell you yet!`,
     html:        htmlMail2,
     scheduledAt,
   });
